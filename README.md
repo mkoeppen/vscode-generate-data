@@ -26,6 +26,10 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### 0.0.2
+
+Remove debug message from result.
+
 ### 0.0.1
 
 Added base features.

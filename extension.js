@@ -181,7 +181,7 @@ function insertData(config) {
 	  edit => editor.selections.forEach(
 		selection => {
 		  edit.delete(selection);
-		  edit.insert(selection.start, generators.find((item) => config.generatorName === item.name).func(config) + ' # ' + faker.locale);
+		  edit.insert(selection.start, generators.find((item) => config.generatorName === item.name).func(config));
 		}
 	  )
 	);
