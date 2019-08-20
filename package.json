@@ -3,6 +3,14 @@
 	"displayName": "Generate Data",
 	"description": "Generate dummy data (e.g. Names, Dates, Numbers, ...)",
 	"version": "0.0.1",
+	"publisher": "mkoeppen",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mkoeppen/vscode-generate-data"
+	},
+	"bugs": {
+		"url": "https://github.com/mkoeppen/vscode-generate-data/issues"
+	},
 	"engines": {
 		"vscode": "^1.37.0"
 	},
