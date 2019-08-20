@@ -10,16 +10,27 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:extension.generateData"
 	],
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
+				"command": "extension.generateData",
+				"title": "Generate Data"
 			}
-		]
+		],
+		"configuration": {
+			"type": "object",
+			"title": "%generateData.configuration.title%",
+			"properties": {
+				"generateData.localisation": {
+					"type": "string",
+					"default": "en_US",
+					"description": "%generateData.configuration.localisation.description%"
+				}
+			}
+		}
 	},
 	"scripts": {
 		"test": "node ./test/runTest.js"
@@ -34,5 +45,8 @@
 		"mocha": "^6.1.4",
 		"typescript": "^3.3.1",
 		"vscode-test": "^1.0.2"
+	},
+	"dependencies": {
+		"faker": "^4.1.0"
 	}
 }
