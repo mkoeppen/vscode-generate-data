@@ -20,6 +20,16 @@
 	"activationEvents": [
 		"onCommand:extension.generateData"
 	],
+	"keywords": [
+		"lorem",
+		"ispum",
+		"dummy",
+		"mock",
+		"text",
+		"dummy data",
+		"test data"
+	],
+	"icon": "images/logo.png",
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
