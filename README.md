@@ -9,6 +9,14 @@ An extention to create dummy data (e.g. names, dates, numbers, uuid, texts, ...)
 2. search for "Generate Data" and press enter
 3. search "lorem.paragraph" for example  and press enter
 
+
+{
+    name: "$gd.name.findName",
+    image: "$gd.image.people",
+    uuid: "$gd.random.uuid"
+}
+
+
 ## Upcoming Features
 
 - multiple data sets (e.g. print 100 names one below the other)

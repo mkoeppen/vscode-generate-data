@@ -15,11 +15,13 @@
 		"vscode": "^1.37.0"
 	},
 	"categories": [
-		"Other"
+		"Other",
+		"Snippets"
 	],
 	"activationEvents": [
 		"onCommand:extension.generateData",
-		"onCommand:extension.generateDataMultiple"
+		"onCommand:extension.generateDataMultiple",
+		"*"
 	],
 	"keywords": [
 		"lorem",
@@ -53,7 +55,25 @@
 					"description": "%generateData.configuration.localisation.description%"
 				}
 			}
-		}
+		},
+		"snippets": [
+			{
+				"language": "html",
+				"path": "./snippets/snippets.json"
+			},			
+			{
+				"language": "json",
+				"path": "./snippets/snippets.json"
+			},			
+			{
+				"language": "javascript",
+				"path": "./snippets/snippets.json"
+			},			
+			{
+				"language": "twig",
+				"path": "./snippets/snippets.json"
+			}
+		]
 	},
 	"scripts": {
 		"test": "node ./test/runTest.js"
