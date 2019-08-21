@@ -170,7 +170,11 @@ const generators = fakerGenerators.map((fg => {
 function activate(context) {
 
 	let disposable = vscode.commands.registerCommand('extension.generateData', listGenerators);
+	context.subscriptions.push(disposable);
 
+	disposable = vscode.commands.registerCommand('extension.generateDataMultiple', function() {
+		listGenerators('multiple');
+	});
 	context.subscriptions.push(disposable);
 }
 exports.activate = activate;
@@ -181,17 +185,19 @@ function insertData(config) {
 	  edit => editor.selections.forEach(
 		selection => {
 		  edit.delete(selection);
-		  edit.insert(selection.start, generators.find((item) => config.generatorName === item.name).func(config));
+		  for(let i=0; i<config.count; i++) {
+			edit.insert(selection.start, (i > 0 ? '\n' : '') + generators.find((item) => config.generatorName === item.name).func(config));
+		  }
 		}
 	  )
 	);
   }
 
-function listGenerators() {
+function listGenerators(type) {
 	const options = {
 		matchOnDescription: true,
 		matchOnDetail: false,
-		placeHolder: "Loading Projects (pick one to open)"
+		placeHolder: "Select generator type"
 	};
 
 	function onRejectListGenerators(reason) {
@@ -205,12 +211,12 @@ function listGenerators() {
 			return;
 		}
 
-		insertData({
-			count: 1,
-			generatorName: selected
+		getInterationCount(type).then((count) => {
+			insertData({
+				count: count,
+				generatorName: selected
+			});
 		});
-
-		vscode.window.showInformationMessage(selected);
 	}
 
 	if (generators.length === 0) {
@@ -224,6 +230,39 @@ function listGenerators() {
 
 	
 }
+
+	function getInterationCount(type) {
+		return new Promise(
+			function(resolve, reject) {
+				if(type === 'multiple') {
+					
+
+					const options = {
+						placeHolder: "How many generations you need?"
+					};
+			
+					function onRejectListGenerators(reason) {
+						vscode.commands.executeCommand("setContext", "inGeneratorCount", false);
+						vscode.window.showInformationMessage(`Error loading generators: ${reason}`);
+					}
+				
+					function onResolve(selected) {
+						vscode.commands.executeCommand("setContext", "inGeneratorCount", false);
+						if (!selected) {
+							return;
+						}
+				
+						resolve(selected)
+					}
+					vscode.commands.executeCommand("setContext", "inGeneratorCount", true);
+					vscode.window.showInputBox(options)
+						.then(onResolve, onRejectListGenerators);
+
+				} else {
+					resolve(1)
+				}
+			});
+	}
 
 // this method is called when your extension is deactivated
 function deactivate() {}

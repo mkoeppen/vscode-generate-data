@@ -18,7 +18,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.generateData"
+		"onCommand:extension.generateData",
+		"onCommand:extension.generateDataMultiple"
 	],
 	"keywords": [
 		"lorem",
@@ -36,6 +37,10 @@
 			{
 				"command": "extension.generateData",
 				"title": "Generate Data"
+			},
+			{
+				"command": "extension.generateDataMultiple",
+				"title": "Generate Data - Multiple"
 			}
 		],
 		"configuration": {
