@@ -1,1 +1,21 @@
-log
+{
+    "customer": [
+    <<gd.loop|10|,>>
+        {
+            "name": "<<gd.name.findName>>",
+            "id": "<<gd.random.uuid>>"
+        }
+    <</gd.loop>>
+    ],
+    "events": [
+    <<gd.loop|10|,>>
+        {
+            "dates": [
+                <<gd.loop|10|,>>
+                "<<gd.date.future>>"
+                <</gd.loop>>
+            ]
+        }
+    <</gd.loop>>
+    ]
+}

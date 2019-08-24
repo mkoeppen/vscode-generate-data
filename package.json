@@ -15,12 +15,12 @@
 		"vscode": "^1.37.0"
 	},
 	"categories": [
-		"Other",
-		"Snippets"
+		"Other"
 	],
 	"activationEvents": [
 		"onCommand:extension.generateData",
 		"onCommand:extension.generateDataMultiple",
+		"onCommand:extension.generateDataReplace",
 		"*"
 	],
 	"keywords": [
@@ -43,6 +43,10 @@
 			{
 				"command": "extension.generateDataMultiple",
 				"title": "Generate Data - Multiple"
+			},
+			{
+				"command": "extension.generateDataReplace",
+				"title": "Generate Data - Replace Placeholder"
 			}
 		],
 		"configuration": {

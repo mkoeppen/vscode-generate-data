@@ -151,7 +151,6 @@ const fakerGenerators = [
 
 faker.locale = vscode.workspace.getConfiguration("generateData").get("localisation", "en");
 
-
 const generators = fakerGenerators.map((fg => {
 	var fakerCommand = "{{" + fg + "}}";
 	return {
@@ -162,8 +161,6 @@ const generators = fakerGenerators.map((fg => {
 	}
 }));
 
-
-
 /**
  * @param {vscode.ExtensionContext} context
  */
@@ -172,72 +169,38 @@ function activate(context) {
 	let disposable = vscode.commands.registerCommand('extension.generateData', listGenerators);
 	context.subscriptions.push(disposable);
 
-	disposable = vscode.commands.registerCommand('extension.generateDataMultiple', function() {
+	disposable = vscode.commands.registerCommand('extension.generateDataMultiple', function () {
 		listGenerators('multiple');
 	});
 	context.subscriptions.push(disposable);
 
-
-	
-
-	let provider1 = vscode.languages.registerCompletionItemProvider('plaintext', {
-
-		provideCompletionItems(document, position, token, context) {
-
-			// a simple completion item which inserts `Hello World!`
-			const simpleCompletion = new vscode.CompletionItem('Hello World!');
-
-			// a completion item that inserts its text as snippet,
-			// the `insertText`-property is a `SnippetString` which we will
-			// honored by the editor.
-			const snippetCompletion = new vscode.CompletionItem('Good part of the day');
-			snippetCompletion.insertText = new vscode.SnippetString('Good ${1|morning,afternoon,evening|}. It is ${1}, right?');
-			snippetCompletion.documentation = new vscode.MarkdownString("Inserts a snippet that lets you select the _appropriate_ part of the day for your greeting.");
-
-			// a completion item that can be accepted by a commit character,
-			// the `commitCharacters`-property is set which means that the completion will
-			// be inserted and then the character will be typed.
-			const commitCharacterCompletion = new vscode.CompletionItem('console');
-			commitCharacterCompletion.commitCharacters = ['.'];
-			commitCharacterCompletion.documentation = new vscode.MarkdownString('Press `.` to get `console.`');
-
-			// a completion item that retriggers IntelliSense when being accepted,
-			// the `command`-property is set which the editor will execute after 
-			// completion has been inserted. Also, the `insertText` is set so that 
-			// a space is inserted after `new`
-			const commandCompletion = new vscode.CompletionItem('new');
-			commandCompletion.kind = vscode.CompletionItemKind.Keyword;
-			commandCompletion.insertText = 'new ';
-			commandCompletion.command = { command: 'editor.action.triggerSuggest', title: 'Re-trigger completions...' };
-
-			// return all completion items as array
-			return [
-				simpleCompletion,
-				snippetCompletion,
-				commitCharacterCompletion,
-				commandCompletion
-			];
-		}
+	disposable = vscode.commands.registerCommand('extension.generateDataReplace', function () {
+		replaceAllPlaceholder();
 	});
-
-	context.subscriptions.push(provider1);
+	context.subscriptions.push(disposable);
 }
 exports.activate = activate;
 
+/**
+ * Insert generator result to current cursor position 
+ */
 function insertData(config) {
 	var editor = vscode.window.activeTextEditor;
 	editor.edit(
-	  edit => editor.selections.forEach(
-		selection => {
-		  edit.delete(selection);
-		  for(let i=0; i<config.count; i++) {
-			edit.insert(selection.start, (i > 0 ? '\n' : '') + generators.find((item) => config.generatorName === item.name).func(config));
-		  }
-		}
-	  )
+		edit => editor.selections.forEach(
+			selection => {
+				edit.delete(selection);
+				for (let i = 0; i < config.count; i++) {
+					edit.insert(selection.start, (i > 0 ? '\n' : '') + generators.find((item) => config.generatorName === item.name).func(config));
+				}
+			}
+		)
 	);
-  }
+}
 
+/**
+ * Show list of generators to select  
+ */
 function listGenerators(type) {
 	const options = {
 		matchOnDescription: true,
@@ -272,43 +235,189 @@ function listGenerators(type) {
 		vscode.window.showQuickPick(generators.map((item) => item.name), options)
 			.then(onResolve, onRejectListGenerators);
 	}
-
-	
 }
 
-	function getInterationCount(type) {
-		return new Promise(
-			function(resolve, reject) {
-				if(type === 'multiple') {
-					
+/**
+ * Ask user how many elements should be generated
+ */
+function getInterationCount(type) {
+	return new Promise(
+		function (resolve) {
+			if (type === 'multiple') {
 
-					const options = {
-						placeHolder: "How many generations you need?",
-						value: 1
-					};
-			
-					function onRejectListGenerators(reason) {
-						vscode.commands.executeCommand("setContext", "inGeneratorCount", false);
-						vscode.window.showInformationMessage(`Error loading generators: ${reason}`);
-					}
-				
-					function onResolve(selected) {
-						vscode.commands.executeCommand("setContext", "inGeneratorCount", false);
-						if (!selected) {
-							return;
-						}
-				
-						resolve(selected)
-					}
-					vscode.commands.executeCommand("setContext", "inGeneratorCount", true);
-					vscode.window.showInputBox(options)
-						.then(onResolve, onRejectListGenerators);
 
-				} else {
-					resolve(1)
+				const options = {
+					placeHolder: "How many generations you need?",
+					value: "1"
+				};
+
+				function onRejectListGenerators(reason) {
+					vscode.commands.executeCommand("setContext", "inGeneratorCount", false);
+					vscode.window.showInformationMessage(`Error loading generators: ${reason}`);
 				}
-			});
+
+				function onResolve(selected) {
+					vscode.commands.executeCommand("setContext", "inGeneratorCount", false);
+					if (!selected) {
+						return;
+					}
+
+					resolve(selected)
+				}
+				vscode.commands.executeCommand("setContext", "inGeneratorCount", true);
+				vscode.window.showInputBox(options)
+					.then(onResolve, onRejectListGenerators);
+
+			} else {
+				resolve(1)
+			}
+		});
+}
+
+function nextLoopTag(content) {
+	var nextLoopStart = content.match(/<<gd.loop\|\d+(\|.+)?>>/);
+	var nextLoopEnd = content.match(/<<\/gd.loop>>/);
+
+	var type = "none";
+	var preContent = content;
+	var afterContent = "";
+	var separator = "";
+	var loopCount = 0;
+
+	if ((nextLoopStart && nextLoopEnd && nextLoopStart.index < nextLoopEnd.index) || (nextLoopStart && !nextLoopEnd)) {
+		type = "start";
+		loopCount = parseInt(nextLoopStart[0].match(/\d+/));
+		separator = nextLoopStart[0].replace(/^<<gd.loop\|\d+/, '').replace(/^\|/, '').replace(/>>$/, '');
+		preContent = content.substr(0, nextLoopStart.index);
+		afterContent = content.substr(nextLoopStart.index + nextLoopStart[0].length);
+	} else if ((nextLoopStart && nextLoopEnd && nextLoopStart.index > nextLoopEnd.index) || (!nextLoopStart && nextLoopEnd)) {
+		type = "end"
+		try {
+			preContent = content.substr(0, nextLoopEnd.index);
+		} catch (e) {
+			console.log("test" + e);
+		}
+		afterContent = content.substr(nextLoopEnd.index + nextLoopEnd[0].length);
 	}
+
+	preContent = preContent.replace(/ *$/, '');
+
+	afterContent = afterContent.replace(/^ *\r\n/, '');
+
+	return {
+		type: type,
+		loopCount: loopCount,
+		preContent: preContent,
+		afterContent: afterContent,
+		separator: separator
+	}
+}
+
+function removeLoops(notParsedContent) {
+
+	var level = 0;
+
+	var levelContent = [
+		""
+	];
+	var levelLoopCount = [];
+	var levelLoopSeparator = [];
+	var current;
+
+	do {
+		current = nextLoopTag(notParsedContent);
+
+		levelContent[level] = (levelContent[level] || "") + current.preContent;
+
+		if (current.type === "start") {
+			level++;
+			notParsedContent = current.afterContent;
+			levelLoopCount[level] = current.loopCount;
+			levelLoopSeparator[level] = current.separator;
+		} else if (current.type === "end") {
+
+			var newlineFix = /\n$/.test(levelContent[level]);
+			if (newlineFix) {
+				levelContent[level] = levelContent[level].replace(/\r\n$/, '').replace(/\n$/, '').replace(/\r$/, '');
+				levelLoopSeparator[level] += '\r\n';
+			}
+
+			levelContent[level - 1] = (levelContent[level - 1] || "") + Array(levelLoopCount[level]).fill(levelContent[level]).join(levelLoopSeparator[level]);
+
+			if (newlineFix) {
+				levelContent[level - 1] += '\r\n';
+			}
+
+			levelContent[level] = "";
+			levelLoopCount[level] = 0;
+			levelLoopSeparator[level] = "";
+			level--;
+			notParsedContent = current.afterContent;
+			if (level < 0) {
+				// Error: Missing generate data loop tag.
+				vscode.window.showInformationMessage("Error: Missing generate data loop-start-tag.");
+				return null;
+			}
+		}
+	} while (current.type !== "none")
+
+	if (level != 0) {
+		// Error: Missing generate data loop tag.
+		vscode.window.showInformationMessage("Error: Missing generate data loop-end-tag.");
+		return null;
+	}
+
+	return levelContent[0];
+}
+
+function removePlaceholderTags(notParsedContent) {
+
+
+	var parsedContent = "";
+	var current;
+
+	do {
+		current = notParsedContent.match(/<<gd\..+>>/);
+		if (current) {
+			parsedContent += notParsedContent.substr(0, current.index);
+			parsedContent += generators.find((item) => current[0].replace(/^<<gd\./, '').replace(/>>$/, '') === item.name).func({});
+			notParsedContent = notParsedContent.substr(current.index + current[0].length)
+		}
+	} while (current)
+
+	parsedContent += notParsedContent;
+
+	return parsedContent;
+}
+
+function replaceAllPlaceholder() {
+
+	const textEditor = vscode.window.activeTextEditor;
+
+	if (!textEditor) {
+		return; // No open text editor
+	}
+
+	var contentWithoutLoops = removeLoops(textEditor.document.getText());
+
+	if (contentWithoutLoops === null) {
+		return;
+	}
+
+	var contentWithoutPlaceholders = removePlaceholderTags(contentWithoutLoops);
+
+	var lastLine = textEditor.document.lineAt(textEditor.document.lineCount - 1);
+	var textRange = new vscode.Range(0, 0, textEditor.document.lineCount - 1, lastLine.range.end.character);
+
+	textEditor.edit(function (editBuilder) {
+		editBuilder.replace(textRange, contentWithoutPlaceholders);
+	}).then(success => {
+		if (success) {
+			var postion = textEditor.selection.end;
+			textEditor.selection = new vscode.Selection(postion, postion);
+		}
+	})
+}
 
 // this method is called when your extension is deactivated
 function deactivate() {}
