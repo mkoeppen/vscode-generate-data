@@ -3,14 +3,68 @@
 An extention to create dummy data (e.g. names, dates, numbers, uuid, texts, ...).
 
 
-## How to use
+# How to use
+
+## Single Generation
 
 1. open command menu (F1)
 2. search for "Generate Data" and press enter
 3. search "lorem.paragraph" for example  and press enter
 
+![Simple Generators](https://github.com/mkoeppen/vscode-generate-data/blob/master/images/simple-generate.gif?raw=true "Simple Generators")
 
-## Generators
+## Multiple Generations
+
+1. open command menu (F1)
+2. search for "Generate Data - Multiple" and press enter
+3. search "lorem.paragraph" for example  and press enter
+4. insert how many generations you need and press enter
+
+![Multiple Generators](https://github.com/mkoeppen/vscode-generate-data/blob/master/images/multiple-generate.gif?raw=true "Multiple Generators")
+
+## How to use Placeholders and Loops
+
+You can write Placeholders like: ```<<gd.address.zipCode>>```
+And Loops:
+
+```<<gd.loop|[count]>>  <</gd.loop>>``` or ```<<gd.loop|[count]|[separator]>>  <</gd.loop>>```<br/>
+```<<gd.loop|100>>  <</gd.loop>>``` or ```<<gd.loop|100|,>>  <</gd.loop>>```
+
+
+1. open command menu (F1)
+2. select "Generate Data - Replace Placeholders" to replace all placeholders
+
+Before:
+```
+<<gd.loop|3|,>>
+    {
+        "name": "<<gd.name.findName>>",
+        "id": "<<gd.random.uuid>>"
+    }
+<</gd.loop>>
+```
+
+After: 
+```
+    {
+        "name": "Ellen Ackermann",
+        "id": "7c1873ad-ed72-4c25-8dbf-84acb9a58a64"
+    },
+    {
+        "name": "Hr. Shawn Agostini",
+        "id": "94bd97f0-7043-42b0-8b97-f5de6d04bcc0"
+    },
+    {
+        "name": "Fr. Ivonne Kobs",
+        "id": "c32eeb53-e796-4ea7-8c98-e3dfaf0c4088"
+    }
+```
+
+![Loop and Placeholders](https://github.com/mkoeppen/vscode-generate-data/blob/master/images/loop-and-placeholder.gif?raw=true "Loop and Placeholders")
+
+
+
+# Generators
 
 Generators used from [Faker.js by Marak Squires](https://github.com/Marak/Faker.js)
 
