@@ -2,7 +2,7 @@
 	"name": "generate-data",
 	"displayName": "Generate Data",
 	"description": "Generate dummy data (e.g. Names, Dates, Numbers, ...)",
-	"version": "0.0.2",
+	"version": "0.1.0",
 	"publisher": "mkoeppen",
 	"repository": {
 		"type": "git",
@@ -62,6 +62,10 @@
 		},
 		"snippets": [
 			{
+				"language": "plaintext",
+				"path": "./snippets/snippets.json"
+			},
+			{
 				"language": "html",
 				"path": "./snippets/snippets.json"
 			},			
@@ -74,7 +78,19 @@
 				"path": "./snippets/snippets.json"
 			},			
 			{
+				"language": "typescript",
+				"path": "./snippets/snippets.json"
+			},			
+			{
 				"language": "twig",
+				"path": "./snippets/snippets.json"
+			},			
+			{
+				"language": "php",
+				"path": "./snippets/snippets.json"
+			},			
+			{
+				"language": "java",
 				"path": "./snippets/snippets.json"
 			}
 		]

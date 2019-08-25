@@ -144,8 +144,8 @@ const fakerGenerators = [
 	'system.commonFileExt',
 	'system.fileType',
 	'system.fileExt',
-	'system.directoryPath',
-	'system.filePath',
+	// 'system.directoryPath',
+	// 'system.filePath',
 	'system.semver'
 ];
 
@@ -377,7 +377,7 @@ function removePlaceholderTags(notParsedContent) {
 	var current;
 
 	do {
-		current = notParsedContent.match(/<<gd\..+>>/);
+		current = notParsedContent.match(/<<gd\..+?>>/);
 		if (current) {
 			parsedContent += notParsedContent.substr(0, current.index);
 			parsedContent += generators.find((item) => current[0].replace(/^<<gd\./, '').replace(/>>$/, '') === item.name).func({});
