@@ -21,7 +21,7 @@ npm install -g vsce
 
 
 ```
-
+vsce publish -p <token>
 ```
 vsce create-publisher {{username}}
 
